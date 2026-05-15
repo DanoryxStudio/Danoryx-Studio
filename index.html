@@ -119,6 +119,20 @@
 
 </script>
 
+<script>
+function updateCart() {
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  return cart;
+}
+
+function removeItem(index) {
+  let cart = updateCart();
+  cart.splice(index, 1);
+  localStorage.setItem("cart", JSON.stringify(cart));
+  location.reload();
+}
+</script>
+
 const user = JSON.parse(localStorage.getItem("danoryx_user"));
 
 console.log("User:", user);
