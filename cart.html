@@ -1,48 +1,128 @@
-cart.forEach(item => {
-      total += item.price * (item.qty || 1);
-    });
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cart - Danoryx Studio</title>
 
-    // SAVE ORDER TO FIRESTORE
-    await db.collection("orders").add({
-      userId: user.uid,
-      items: cart,
-      total: total,
-      status: "pending",
-      createdAt: new Date()
-    });
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-    // WHATSAPP MESSAGE
-    let message = "🛍️ Danoryx Studio Order\n\n";
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-    cart.forEach(item => {
+<body class="bg-[#f8f3ed] p-6">
 
-      let qty = item.qty || 1;
+<h1 class="text-3xl font-bold mb-6">Your Cart</h1>
 
-      message +=
-      item.product +
-      " x" + qty +
-      " - RM" + item.price +
-      "\n";
-    });
+<div id="cartItems" class="space-y-4"></div>
 
-    message += "\nTotal: RM" + total;
-    message += "\n\nTerima kasih ❤️";
+<h2 class="text-2xl font-bold mt-6">
+  Total: RM <span id="totalPrice">0</span>
+</h2>
 
-    let url =
-    "https://wa.me/601170720910?text=" +
-    encodeURIComponent(message);
+<button onclick="checkout()"
+  class="mt-4 bg-green-600 text-white px-6 py-3 rounded-xl">
+  Checkout
+</button>
 
-    window.open(url, "_blank");
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAndku52aqfjlTNJMuw80bZWzRVHFP-dcc",
+  authDomain: "donoryx-studio.firebaseapp.com",
+  projectId: "donoryx-studio",
+  storageBucket: "donoryx-studio.appspot.com",
+  messagingSenderId: "373709857804",
+  appId: "1:373709857804:web:9efec743f0147923fc3a29"
+};
 
-    // CLEAR CART
-    localStorage.removeItem("cart");
+firebase.initializeApp(firebaseConfig);
 
-    alert("Order submitted!");
+const db = firebase.firestore();
 
-    window.location.href = "dashboard.html";
+/* CART LOAD */
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function renderCart(){
+
+  let container = document.getElementById("cartItems");
+  let total = 0;
+
+  container.innerHTML = "";
+
+  cart.forEach((item, index) => {
+
+    let subtotal = (item.price  0) * (item.qty  1);
+    total += subtotal;
+
+    container.innerHTML += 
+      <div class="bg-white p-4 rounded-xl shadow flex justify-between">
+
+        <div>
+          <h3 class="font-bold">${item.product}</h3>
+          <p>RM${item.price} x ${item.qty || 1}</p>
+        </div>
+
+      </div>
+    ;
+  });
+
+  document.getElementById("totalPrice").innerText = total;
+}
+
+/* CHECKOUT */
+async function checkout(){
+
+  if(cart.length === 0){
+    alert("Cart kosong!");
+    return;
   }
 
-  renderCart();
+  let user = firebase.auth().currentUser;
+
+  if(!user){
+    alert("Please login first");
+    window.location.href = "login.html";
+    return;
+  }
+
+  let total = 0;
+
+  cart.forEach(item => {
+    total += (item.price  0) * (item.qty  1);
+  });
+
+  // SAVE ORDER
+  await db.collection("orders").add({
+    userId: user.uid,
+    items: cart,
+    total: total,
+    status: "pending",
+    createdAt: new Date()
+  });
+
+  // WHATSAPP
+  let message = "🛍️ Danoryx Studio Order\n\n";
+
+  cart.forEach(item => {
+    let qty = item.qty || 1;
+    message += ${item.product} x${qty} - RM${item.price * qty}\n;
+  });
+
+  message += \nTotal: RM${total};
+
+  let url = "https://wa.me/601170720910?text=" + encodeURIComponent(message);
+
+  window.open(url, "_blank");
+
+  localStorage.removeItem("cart");
+
+  alert("Order submitted!");
+  window.location.href = "dashboard.html";
+}
+
+renderCart();
+
 </script>
 
 </body>
