@@ -99,9 +99,22 @@ function removeItem(index) {
 }
 
 function checkout() {
+function checkout() {
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-  let message = "Hello Danoryx Studio, saya nak order:\n\n";
+  if(cart.length === 0){
+    alert("Cart kosong");
+    return;
+  }
+
+  let name = prompt("Nama anda:");
+  let phone = prompt("No phone:");
+
+  let message = "🛍️ Hello Danoryx Studio\n\n";
+  message += "Nama: " + name + "\n";
+  message += "Phone: " + phone + "\n\n";
+  message += "Order:\n";
+
   let total = 0;
 
   cart.forEach(item => {
@@ -110,6 +123,7 @@ function checkout() {
   });
 
   message += "\nTotal: RM" + total;
+  message += "\n\nTerima kasih!";
 
   let url = "https://wa.me/601170720910?text=" + encodeURIComponent(message);
 
