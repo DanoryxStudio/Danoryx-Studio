@@ -1,141 +1,100 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard - Danoryx Studio</title>
+document.getElementById("points").innerText =
+      data.points || 0;
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+      // RANK BADGE
+      let sales = data.totalSales || 0;
 
-  <script src="https://cdn.tailwindcss.com"></script>
+      let badge = "Bronze";
 
-  <style>
-    body{
-      font-family:Poppins, sans-serif;
-      background:#f8f3ed;
-    }
-  </style>
-</head>
+      if(sales >= 100){
+        badge = "Silver";
+      }
 
-<body>
+      if(sales >= 500){
+        badge = "Gold";
+      }
 
-<!-- TOP BAR -->
-<div class="bg-[#6d5244] text-white p-4 flex justify-between items-center">
-  <h1 class="font-bold text-lg">Danoryx Studio Dashboard</h1>
+      if(sales >= 1000){
+        badge = "Platinum";
+      }
 
-  <button onclick="logout()" class="bg-white text-black px-4 py-1 rounded-full">
-    Logout
-  </button>
-</div>
-
-<!-- MAIN -->
-<div class="max-w-6xl mx-auto p-6">
-
-  <!-- USER CARD -->
-  <div class="bg-white p-6 rounded-3xl shadow mt-6">
-
-    <h2 class="text-2xl font-bold">Welcome 👋</h2>
-
-    <p class="mt-2 text-gray-600">
-      Email: <span id="email">-</span>
-    </p>
-
-    <p class="mt-1 text-gray-600">
-      User ID: <span id="userid">-</span>
-    </p>
-
-    <p class="mt-1 text-gray-600">
-      Role: <span id="role">-</span>
-    </p>
-
-  </div>
-
-  <!-- STATS -->
-  <div class="grid md:grid-cols-3 gap-6 mt-6">
-
-    <div class="bg-white p-6 rounded-3xl shadow text-center">
-      <h3 class="text-xl font-bold">Total Sales</h3>
-      <p class="text-3xl mt-2">RM <span id="sales">0</span></p>
-    </div>
-
-    <div class="bg-white p-6 rounded-3xl shadow text-center">
-      <h3 class="text-xl font-bold">Points</h3>
-      <p class="text-3xl mt-2"><span id="points">0</span></p>
-    </div>
-
-    <div class="bg-white p-6 rounded-3xl shadow text-center">
-      <h3 class="text-xl font-bold">Status</h3>
-      <p class="text-green-600 font-bold mt-2">ACTIVE</p>
-    </div>
-
-  </div>
-
-  <!-- ACTIONS -->
-  <div class="grid md:grid-cols-3 gap-6 mt-6">
-
-    <div class="bg-white p-6 rounded-3xl shadow hover:scale-105 transition cursor-pointer">
-      📦 Order History
-    </div>
-
-    <div class="bg-white p-6 rounded-3xl shadow hover:scale-105 transition cursor-pointer">
-      📢 Marketing Material
-    </div>
-
-    <div class="bg-white p-6 rounded-3xl shadow hover:scale-105 transition cursor-pointer">
-      🔗 Referral Link
-    </div>
-
-  </div>
-
-</div>
-
-<script>
-  // FIREBASE CONFIG
-  const firebaseConfig = {
-    apiKey: "AIzaSyAndku52aqfjlTNJMuw80bZWzRVHFP-dcc",
-    authDomain: "donoryx-studio.firebaseapp.com",
-    projectId: "donoryx-studio",
-    storageBucket: "donoryx-studio.appspot.com",
-    messagingSenderId: "373709857804",
-    appId: "1:373709857804:web:9efec743f0147923fc3a29"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  // GET USER DATA
-  auth.onAuthStateChanged(async (user) => {
-
-    if(!user){
-      window.location.href = "login.html";
-      return;
-    }
-
-    document.getElementById("email").innerText = user.email;
-
-    let doc = await db.collection("users").doc(user.uid).get();
-
-    if(doc.exists){
-      let data = doc.data();
-
-      document.getElementById("userid").innerText = data.userId || "-";
-      document.getElementById("role").innerText = data.role || "-";
-      document.getElementById("sales").innerText = data.totalSales || 0;
-      document.getElementById("points").innerText = data.points || 0;
+      document.getElementById("rankBadge").innerText =
+      badge;
     }
   });
 
+  // LOAD LEADERBOARD
+  async function loadLeaderboard(){
+
+    let snapshot =
+    await db.collection("users")
+    .orderBy("totalSales", "desc")
+    .limit(10)
+    .get();
+
+    let html = "";
+
+    let rank = 1;
+
+    snapshot.forEach(doc => {
+
+      let u = doc.data();
+
+      let badge = "Bronze";
+
+      if((u.totalSales || 0) >= 100){
+        badge = "Silver";
+      }
+
+      if((u.totalSales || 0) >= 500){
+        badge = "Gold";
+      }
+
+      if((u.totalSales || 0) >= 1000){
+        badge = "Platinum";
+      }
+
+      html += 
+        <div class="flex justify-between items-center border p-4 rounded-xl">
+
+          <div>
+
+            <p class="font-bold">
+              #${rank} ${u.email}
+            </p>
+
+            <p class="text-sm text-gray-500">
+              Sales: RM${u.totalSales || 0}
+            </p>
+
+          </div>
+
+          <span class="bg-black text-white px-4 py-1 rounded-full">
+            ${badge}
+          </span>
+
+        </div>
+      ;
+
+      rank++;
+    });
+
+    document.getElementById("leaderboardList").innerHTML =
+    html;
+  }
+
   // LOGOUT
   function logout(){
+
     auth.signOut().then(() => {
+
       window.location.href = "login.html";
+
     });
   }
+
+  // LOAD
+  loadLeaderboard();
 </script>
 
 </body>
