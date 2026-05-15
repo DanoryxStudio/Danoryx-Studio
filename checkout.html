@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout - Danoryx Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#f8f3ed] text-[#4b352a] p-10">
+
+  <h1 class="text-4xl font-bold mb-8">Checkout</h1>
+
+  <div class="bg-white p-6 rounded-2xl shadow space-y-4">
+
+    <input id="name" placeholder="Full Name" class="w-full p-3 border rounded-xl">
+    <input id="phone" placeholder="Phone Number" class="w-full p-3 border rounded-xl">
+    <textarea id="address" placeholder="Full Address" class="w-full p-3 border rounded-xl"></textarea>
+
+    <button
+      onclick="sendOrder()"
+      class="bg-[#6d5244] text-white px-6 py-3 rounded-full w-full mt-4"
+    >
+      Submit Order
+    </button>
+
+  </div>
+
+<script>
+function sendOrder(){
+
+  const user = JSON.parse(localStorage.getItem("danoryx_user"));
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  if(cart.length === 0){
+    alert("Cart empty!");
+    return;
+  }
+
+  let items = "";
+  let total = 0;
+
+  cart.forEach(c=>{
+    items += \n- ${c.name} RM${c.price};
+    total += c.price;
+  });
+
+  const message =
+Hello Danoryx Studio
+
+Name: ${document.getElementById("name").value}
+Phone: ${document.getElementById("phone").value}
+Address: ${document.getElementById("address").value}
+
+User ID: ${user ? user.id : "Guest"}
+
+Order:
+${items}
+
+Total: RM${total}
+
+Thank you!
+;
+
+  window.open(
+    "https://wa.me/601170720910?text=" + encodeURIComponent(message),
+    "_blank"
+  );
+
+  localStorage.removeItem("cart");
+}
+</script>
+
+</body>
+</html>
