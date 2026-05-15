@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel - Danoryx Studio</title>
+
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body{
+      font-family:Poppins, sans-serif;
+      background:#f8f3ed;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="bg-black text-white p-4 flex justify-between items-center">
+  <h1 class="font-bold text-lg">ADMIN PANEL - Danoryx Studio</h1>
+
+  <button onclick="logout()" class="bg-white text-black px-4 py-1 rounded-full">
+    Logout
+  </button>
+</div>
+
+<!-- CONTAINER -->
+<div class="max-w-6xl mx-auto p-6">
+
+  <!-- STATS -->
+  <div class="grid md:grid-cols-3 gap-6">
+
+    <div class="bg-white p-6 rounded-2xl shadow">
+      <h2 class="font-bold text-xl">Total Users</h2>
+      <p id="totalUsers" class="text-3xl mt-2">0</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl shadow">
+      <h2 class="font-bold text-xl">Agents</h2>
+      <p id="totalAgents" class="text-3xl mt-2">0</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl shadow">
+      <h2 class="font-bold text-xl">Dropship</h2>
+      <p id="totalDropship" class="text-3xl mt-2">0</p>
+    </div>
+
+  </div>
+
+  <!-- USER LIST -->
+  <div class="bg-white mt-8 p-6 rounded-2xl shadow">
+
+    <h2 class="text-xl font-bold mb-4">User List</h2>
+
+    <div id="userList" class="space-y-3"></div>
+
+  </div>
+
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAndku52aqfjlTNJMuw80bZWzRVHFP-dcc",
+    authDomain: "donoryx-studio.firebaseapp.com",
+    projectId: "donoryx-studio",
+    storageBucket: "donoryx-studio.appspot.com",
+    messagingSenderId: "373709857804",
+    appId: "1:373709857804:web:9efec743f0147923fc3a29"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  let totalUsers = 0;
+  let agents = 0;
+  let dropship = 0;
+
+  // LOAD USERS
+  async function loadUsers(){
+
+    let snapshot = await db.collection("users").get();
+
+    let html = "";
+
+    snapshot.forEach(doc => {
+      let u = doc.data();
+      totalUsers++;
+
+      if(u.role === "agent") agents++;
+      else dropship++;
+
+      html += 
+        <div class="border p-4 rounded-xl flex justify-between items-center">
+
+          <div>
+            <p class="font-bold">${u.email}</p>
+            <p class="text-sm text-gray-500">${u.userId}</p>
+            <p class="text-sm">Role: ${u.role}</p>
+          </div>
+
+          <button onclick="makeAgent('${doc.id}')"
+            class="bg-green-600 text-white px-4 py-2 rounded-xl">
+            Make Agent
+          </button>
+
+        </div>
+      ;
+    });
+
+    document.getElementById("userList").innerHTML = html;
+    document.getElementById("totalUsers").innerText = totalUsers;
+    document.getElementById("totalAgents").innerText = agents;
+    document.getElementById("totalDropship").innerText = dropship;
+  }
+
+  // PROMOTE TO AGENT
+  async function makeAgent(id){
+    await db.collection("users").doc(id).update({
+      role: "agent"
+    });
+
+    alert("User promoted to agent!");
+    location.reload();
+  }
+
+  // LOGOUT
+  function logout(){
+    auth.signOut().then(()=>{
+      window.location.href = "login.html";
+    });
+  }
+
+  loadUsers();
+</script>
+
+</body>
+</html>
