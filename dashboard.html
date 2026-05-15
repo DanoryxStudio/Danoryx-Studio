@@ -1,76 +1,56 @@
-// GET USER DATA
+<script>
+  // GET USER DATA
   auth.onAuthStateChanged(async (user) => {
 
     if(!user){
-
       window.location.href = "login.html";
       return;
     }
 
-    document.getElementById("email").innerText =
-    user.email;
+    document.getElementById("email").innerText = user.email;
 
-    let doc =
-    await db.collection("users").doc(user.uid).get();
+    let doc = await db.collection("users").doc(user.uid).get();
 
     if(doc.exists){
 
       let data = doc.data();
 
-      document.getElementById("userid").innerText =
-      data.userId || "-";
-
-      document.getElementById("role").innerText =
-      data.role || "-";
-
-      document.getElementById("sales").innerText =
-      data.totalSales || 0;
-
-      document.getElementById("points").innerText =
-      data.points || 0;
+      document.getElementById("userid").innerText = data.userId || "-";
+      document.getElementById("role").innerText = data.role || "-";
+      document.getElementById("sales").innerText = data.totalSales || 0;
+      document.getElementById("points").innerText = data.points || 0;
 
       // REFERRAL LINK
       let ref =
-      window.location.origin +
-      "/login.html?ref=" +
-      (data.userId || "");
+        window.location.origin +
+        "/login.html?ref=" +
+        (data.userId || "");
 
-      document.getElementById("refLink").value =
-      ref;
+      if(document.getElementById("refLink")){
+        document.getElementById("refLink").value = ref;
+      }
 
-      // RANK BADGE
+      // RANK SYSTEM
       let sales = data.totalSales || 0;
-
       let badge = "Bronze";
 
-      if(sales >= 100){
-        badge = "Silver";
-      }
+      if(sales >= 100) badge = "Silver";
+      if(sales >= 500) badge = "Gold";
+      if(sales >= 1000) badge = "Platinum";
 
-      if(sales >= 500){
-        badge = "Gold";
-      }
-
-      if(sales >= 1000){
-        badge = "Platinum";
-      }
-
-      document.getElementById("rankBadge").innerText =
-      badge;
+      document.getElementById("rankBadge").innerText = badge;
     }
   });
 
   // LOAD LEADERBOARD
   async function loadLeaderboard(){
 
-    let snapshot =
-    await db.collection("users")
-    .orderBy("totalSales", "desc")
-    .limit(10)
-    .get();
+    let snapshot = await db.collection("users")
+      .orderBy("totalSales", "desc")
+      .limit(10)
+      .get();
 
     let html = "";
-
     let rank = 1;
 
     snapshot.forEach(doc => {
@@ -78,32 +58,18 @@
       let u = doc.data();
 
       let badge = "Bronze";
+      let sales = u.totalSales || 0;
 
-      if((u.totalSales || 0) >= 100){
-        badge = "Silver";
-      }
-
-      if((u.totalSales || 0) >= 500){
-        badge = "Gold";
-      }
-
-      if((u.totalSales || 0) >= 1000){
-        badge = "Platinum";
-      }
+      if(sales >= 100) badge = "Silver";
+      if(sales >= 500) badge = "Gold";
+      if(sales >= 1000) badge = "Platinum";
 
       html += 
         <div class="flex justify-between items-center border p-4 rounded-xl">
 
           <div>
-
-            <p class="font-bold">
-              #${rank} ${u.email}
-            </p>
-
-            <p class="text-sm text-gray-500">
-              Sales: RM${u.totalSales || 0}
-            </p>
-
+            <p class="font-bold">#${rank} ${u.email}</p>
+            <p class="text-sm text-gray-500">Sales: RM${sales}</p>
           </div>
 
           <span class="bg-black text-white px-4 py-1 rounded-full">
@@ -116,18 +82,18 @@
       rank++;
     });
 
-    document.getElementById("leaderboardList").innerHTML =
-    html;
+    document.getElementById("leaderboardList").innerHTML = html;
   }
 
   // COPY REFERRAL LINK
   function copyRef(){
 
-    let input =
-    document.getElementById("refLink");
+    let input = document.getElementById("refLink");
+
+    if(!input) return;
 
     input.select();
-    input.setSelectionRange(0,99999);
+    input.setSelectionRange(0, 99999);
 
     navigator.clipboard.writeText(input.value);
 
@@ -136,17 +102,11 @@
 
   // LOGOUT
   function logout(){
-
     auth.signOut().then(() => {
-
       window.location.href = "login.html";
-
     });
   }
 
-  // LOAD
+  // INIT
   loadLeaderboard();
 </script>
-
-</body>
-</html>
