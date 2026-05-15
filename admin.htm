@@ -64,9 +64,9 @@ async function loadUsers(){
     html += 
       <div class="bg-white p-4 rounded-xl shadow">
 
-        <p class="font-bold">${u.email}</p>
-        <p class="text-sm text-gray-500">${u.userId}</p>
-        <p>Role: ${u.role}</p>
+        <p class="font-bold">${u.email || "-"}</p>
+        <p class="text-sm text-gray-500">${u.userId || "-"}</p>
+        <p>Role: ${u.role || "-"}</p>
 
         <button onclick="makeAgent('${doc.id}')"
           class="mt-3 bg-green-600 text-white px-4 py-2 rounded-xl">
@@ -77,7 +77,7 @@ async function loadUsers(){
     ;
   });
 
-  document.getElementById("userList").innerHTML = html;
+  document.getElementById("userList").innerHTML = html || "<p>No users</p>";
 }
 
 async function makeAgent(id){
@@ -102,13 +102,16 @@ async function loadOrders(){
 
     let order = doc.data();
 
+    let total = order.total || 0;
+    let userId = order.userId || "";
+
     html += 
       <div class="bg-white p-4 rounded-xl shadow">
 
         <p class="font-bold">Order ID:</p>
         <p class="text-sm text-gray-500 mb-2">${doc.id}</p>
 
-        <p>Total: RM${order.total || 0}</p>
+        <p>Total: RM${total}</p>
 
         <p>Status:
           <span class="text-orange-500">
@@ -117,7 +120,7 @@ async function loadOrders(){
         </p>
 
         <button
-          onclick="completeOrder('${doc.id}','${order.userId}',${order.total || 0})"
+          onclick="completeOrder('${doc.id}','${userId}',${total})"
           class="mt-4 bg-green-600 text-white px-4 py-2 rounded-xl">
           Complete Order
         </button>
@@ -126,46 +129,53 @@ async function loadOrders(){
     ;
   });
 
-  document.getElementById("orderList").innerHTML = html;
+  document.getElementById("orderList").innerHTML = html || "<p>No orders</p>";
 }
 
 /* COMPLETE ORDER */
 
 async function completeOrder(orderId, userId, total){
 
-  await db.collection("orders").doc(orderId).update({
-    status: "completed"
-  });
+  try {
 
-  let ref = db.collection("users").doc(userId);
-  let doc = await ref.get();
-
-  if(doc.exists){
-
-    let data = doc.data();
-
-    let newSales = (data.totalSales || 0) + total;
-    let newPoints = (data.points || 0) + Math.floor(total / 10);
-
-    await ref.update({
-      totalSales: newSales,
-      points: newPoints
+    await db.collection("orders").doc(orderId).update({
+      status: "completed"
     });
+
+    if(userId){
+
+      let ref = db.collection("users").doc(userId);
+      let doc = await ref.get();
+
+      if(doc.exists){
+
+        let data = doc.data();
+
+        let newSales = (data.totalSales || 0) + total;
+        let newPoints = (data.points || 0) + Math.floor(total / 10);
+
+        await ref.update({
+          totalSales: newSales,
+          points: newPoints
+        });
+      }
+    }
+
+    alert("Order completed!");
+
+    loadOrders();
+
+  } catch (e) {
+    alert("Error: " + e.message);
   }
-
-  alert("Order completed!");
-
-  location.reload();
 }
 
 /* ---------------- LOGOUT ---------------- */
 
 function logout(){
-
   auth.signOut().then(() => {
     window.location.href = "login.html";
   });
-
 }
 
 /* INIT */
