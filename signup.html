@@ -1,0 +1,33 @@
+<h2>Sign Up Danoryx Studio</h2>
+
+<input id="name" placeholder="Full Name">
+<input id="email" placeholder="Email">
+
+<select id="role">
+  <option value="dropship">Dropship (Free)</option>
+  <option value="agent">Agent (RM10)</option>
+</select>
+
+<button onclick="signup()">Create Account</button>
+
+<script>
+function generateID(role){
+  return (role === "agent" ? "AG-" : "DS-") +
+  Math.floor(1000000 + Math.random() * 9000000);
+}
+
+function signup(){
+  const user = {
+    name: document.getElementById("name").value,
+    email: document.getElementById("email").value,
+    role: document.getElementById("role").value,
+    id: generateID(document.getElementById("role").value)
+  };
+
+  localStorage.setItem("danoryx_user", JSON.stringify(user));
+
+  alert("Account Created!\nYour ID: " + user.id);
+
+  window.location.href = "login.html";
+}
+</script>
