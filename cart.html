@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cart - Danoryx Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#f8f3ed] text-[#4b352a] p-10">
+
+  <h1 class="text-4xl font-bold mb-10">Your Cart</h1>
+
+  <div id="cartBox" class="space-y-4"></div>
+
+  <div class="mt-10">
+    <h2 id="total" class="text-2xl font-bold"></h2>
+
+    <button
+      onclick="goCheckout()"
+      class="mt-6 bg-[#6d5244] text-white px-6 py-3 rounded-full"
+    >
+      Proceed Checkout
+    </button>
+  </div>
+
+<script>
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+let box = document.getElementById("cartBox");
+let total = 0;
+
+function renderCart(){
+
+  box.innerHTML = "";
+  total = 0;
+
+  cart.forEach((item, index)=>{
+    box.innerHTML += 
+      <div class="bg-white p-5 rounded-2xl shadow flex justify-between">
+        <span>${item.name}</span>
+        <span>RM${item.price}</span>
+      </div>
+    ;
+
+    total += item.price;
+  });
+
+  document.getElementById("total").innerText =
+  "Total: RM" + total;
+}
+
+renderCart();
+
+function goCheckout(){
+  window.location.href = "checkout.html";
+}
+</script>
+
+</body>
+</html>
