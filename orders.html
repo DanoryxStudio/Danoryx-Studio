@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Orders - Danoryx Studio</title>
+
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#f8f3ed] p-6">
+
+<h1 class="text-3xl font-bold mb-6">My Orders</h1>
+
+<div id="orderList" class="space-y-4"></div>
+
+<script>
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAndku52aqfjlTNJMuw80bZWzRVHFP-dcc",
+  authDomain: "donoryx-studio.firebaseapp.com",
+  projectId: "donoryx-studio",
+  storageBucket: "donoryx-studio.appspot.com",
+  messagingSenderId: "373709857804",
+  appId: "1:373709857804:web:9efec743f0147923fc3a29"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+/* LOAD ORDERS */
+auth.onAuthStateChanged(async (user) => {
+
+  if(!user){
+    window.location.href = "login.html";
+    return;
+  }
+
+  let snap = await db.collection("orders")
+    .where("userId", "==", user.uid)
+    .orderBy("createdAt", "desc")
+    .get();
+
+  let html = "";
+
+  snap.forEach(doc => {
+
+    let o = doc.data();
+
+    let color = "text-orange-500";
+
+    if(o.status === "completed") color = "text-green-600";
+    if(o.status === "pending") color = "text-yellow-500";
+
+    html += 
+      <div class="bg-white p-4 rounded-xl shadow">
+
+        <p class="font-bold">Order ID: ${doc.id}</p>
+
+        <p>Total: RM${o.total}</p>
+
+        <p>Status:
+          <span class="${color} font-bold">
+            ${o.status}
+          </span>
+        </p>
+
+      </div>
+    ;
+  });
+
+  document.getElementById("orderList").innerHTML = html || "<p>No orders yet</p>";
+});
+
+</script>
+
+</body>
+</html>
