@@ -64,6 +64,60 @@ renderCart();
 function goCheckout(){
   window.location.href = "checkout.html";
 }
+
+  <script>
+function loadCart() {
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  let container = document.getElementById("cartItems");
+  let total = 0;
+
+  container.innerHTML = "";
+
+  cart.forEach((item, index) => {
+    total += item.price;
+
+    container.innerHTML += 
+      <div class="bg-white p-4 rounded-xl shadow flex justify-between items-center">
+        <div>
+          <h3 class="font-bold">${item.product}</h3>
+          <p>RM${item.price}</p>
+        </div>
+        <button onclick="removeItem(${index})" class="text-red-500">Remove</button>
+      </div>
+    ;
+  });
+
+  document.getElementById("totalPrice").innerText = "Total: RM" + total;
+}
+
+function removeItem(index) {
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  cart.splice(index, 1);
+  localStorage.setItem("cart", JSON.stringify(cart));
+  loadCart();
+}
+
+function checkout() {
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  let message = "Hello Danoryx Studio, saya nak order:\n\n";
+  let total = 0;
+
+  cart.forEach(item => {
+    message += "- " + item.product + " RM" + item.price + "\n";
+    total += item.price;
+  });
+
+  message += "\nTotal: RM" + total;
+
+  let url = "https://wa.me/601170720910?text=" + encodeURIComponent(message);
+
+  window.open(url, "_blank");
+}
+
+loadCart();
+</script>
 </script>
 
 </body>
