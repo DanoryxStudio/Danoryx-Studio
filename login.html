@@ -64,30 +64,36 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // 🔥 SIGN UP + SAVE TO FIRESTORE
+    // 🔥 SIGN UP (CREATE USER + SAVE FIRESTORE)
     function signup(){
+
       let email = document.getElementById("email").value;
       let password = document.getElementById("password").value;
 
+      if(!email || !password){
+        alert("Please fill all fields");
+        return;
+      }
+
       auth.createUserWithEmailAndPassword(email, password)
-      .then((userCredential) => {
+      .then(async (userCredential) => {
 
         let user = userCredential.user;
 
-        // AUTO ID DROPSHIP
-        let userID = "DS-" + Math.floor(1000000 + Math.random() * 9000000);
+        // AUTO ID
+        let userId = "DS-" + Math.floor(1000000 + Math.random()*9000000);
 
         // SAVE TO FIRESTORE
-        db.collection("users").doc(user.uid).set({
+        await db.collection("users").doc(user.uid).set({
           email: user.email,
-          userId: userID,
+          userId: userId,
           role: "dropship",
           totalSales: 0,
           points: 0,
           joinDate: new Date()
         });
 
-        alert("Account created!");
+        alert("Account created successfully!");
         window.location.href = "dashboard.html";
 
       })
@@ -96,13 +102,19 @@
 
     // 🔥 LOGIN
     function login(){
-      auth.signInWithEmailAndPassword(
-        document.getElementById("email").value,
-        document.getElementById("password").value
-      )
+
+      let email = document.getElementById("email").value;
+      let password = document.getElementById("password").value;
+
+      if(!email || !password){
+        alert("Please fill all fields");
+        return;
+      }
+
+      auth.signInWithEmailAndPassword(email, password)
       .then(() => {
         alert("Login success!");
-        window.location.href = "index.html";
+        window.location.href = "dashboard.html";
       })
       .catch(err => alert(err.message));
     }
