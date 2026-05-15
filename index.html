@@ -1,0 +1,123 @@
+<div class="text-center mb-14">
+      <h2 class="text-5xl font-bold">
+        FAQ
+      </h2>
+    </div>
+
+    <div class="space-y-6">
+
+      <div class="bg-white p-6 rounded-3xl shadow">
+        <h3 class="font-bold text-xl">
+          Berapa yuran agent?
+        </h3>
+        <p class="mt-2 text-gray-600">
+          Yuran agent hanya RM10 sahaja.
+        </p>
+      </div>
+
+      <div class="bg-white p-6 rounded-3xl shadow">
+        <h3 class="font-bold text-xl">
+          Dropship free ke?
+        </h3>
+        <p class="mt-2 text-gray-600">
+          Ya, dropship register secara percuma.
+        </p>
+      </div>
+
+      <div class="bg-white p-6 rounded-3xl shadow">
+        <h3 class="font-bold text-xl">
+          Ada marketing material?
+        </h3>
+        <p class="mt-2 text-gray-600">
+          Ya, semua agent & dropship akan dapat material marketing.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-[#4b352a] text-white py-12">
+
+  <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-10">
+
+    <div>
+      <h2 class="text-3xl font-bold">
+        Danoryx Studio
+      </h2>
+      <p class="mt-4 text-gray-300">
+        Premium Crochet Brand & Dropship Platform
+      </p>
+    </div>
+
+    <div>
+      <h3 class="font-bold text-xl mb-4">
+        Navigation
+      </h3>
+
+      <div class="space-y-2 text-gray-300">
+        <p>Home</p>
+        <p>Catalog</p>
+        <p>Leaderboard</p>
+        <p>Hiring</p>
+      </div>
+    </div>
+
+    <div>
+      <h3 class="font-bold text-xl mb-4">
+        Contact
+      </h3>
+
+      <div class="space-y-2 text-gray-300">
+        <p>01170720910</p>
+        <p>Danoryx Studio Malaysia</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+<!-- FLOATING WHATSAPP -->
+<a
+  href="https://wa.me/601170720910"
+  target="_blank"
+  class="fixed bottom-6 right-6 bg-green-500 w-16 h-16 rounded-full flex items-center justify-center text-white text-3xl shadow-2xl hover:scale-110 transition"
+>
+💬
+</a>
+
+<script>
+
+  let cart = [];
+
+  function addToCart(product,price){
+
+    cart.push({
+      product,
+      price
+    });
+
+    localStorage.setItem('cart',JSON.stringify(cart));
+
+    alert(product + " added to cart!");
+  }
+
+  function generateDropshipID(){
+    return "DS-" + Math.floor(1000000 + Math.random() * 9000000);
+  }
+
+  function generateAgentID(){
+    return "AG-" + Math.floor(1000000 + Math.random() * 9000000);
+  }
+
+  console.log(generateDropshipID());
+  console.log(generateAgentID());
+
+</script>
+
+</body>
+</html>
