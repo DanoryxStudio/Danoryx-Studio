@@ -1,0 +1,22 @@
+<h2>Login Danoryx Studio</h2>
+
+<input id="email" placeholder="Email">
+
+<button onclick="login()">Login</button>
+
+<script>
+function login(){
+  const email = document.getElementById("email").value;
+
+  if(!email){
+    alert("Please enter email");
+    return;
+  }
+
+  localStorage.setItem("danoryx_login", email);
+
+  alert("Login Successful");
+
+  window.location.href = "index.html";
+}
+</script>
