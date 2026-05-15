@@ -1,22 +1,87 @@
-<h2>Login Danoryx Studio</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - Danoryx Studio</title>
 
-<input id="email" placeholder="Email">
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
-<button onclick="login()">Login</button>
+  <style>
+    body{
+      font-family: Arial;
+      background:#f8f3ed;
+      text-align:center;
+      padding:50px;
+    }
 
-<script>
-function login(){
-  const email = document.getElementById("email").value;
+    input{
+      padding:12px;
+      margin:10px;
+      width:250px;
+      border-radius:10px;
+      border:1px solid #ccc;
+    }
 
-  if(!email){
-    alert("Please enter email");
-    return;
-  }
+    button{
+      padding:12px 20px;
+      margin:10px;
+      border:none;
+      border-radius:10px;
+      background:#6d5244;
+      color:white;
+      cursor:pointer;
+    }
+  </style>
+</head>
 
-  localStorage.setItem("danoryx_login", email);
+<body>
 
-  alert("Login Successful");
+  <h1>Danoryx Studio Login</h1>
 
-  window.location.href = "index.html";
-}
-</script>
+  <!-- INPUT -->
+  <input id="email" type="email" placeholder="Email"><br>
+  <input id="password" type="password" placeholder="Password"><br>
+
+  <!-- BUTTON -->
+  <button onclick="signup()">Sign Up</button>
+  <button onclick="login()">Login</button>
+
+  <script>
+    // 🔥 FIREBASE CONFIG (PASTE YOUR OWN FROM FIREBASE)
+    const firebaseConfig = {
+      apiKey: "PASTE_HERE",
+      authDomain: "PASTE_HERE",
+      projectId: "PASTE_HERE"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // SIGN UP
+    function signup(){
+      auth.createUserWithEmailAndPassword(
+        document.getElementById("email").value,
+        document.getElementById("password").value
+      ).then(() => {
+        alert("Account created!");
+        window.location.href = "index.html";
+      }).catch(err => alert(err.message));
+    }
+
+    // LOGIN
+    function login(){
+      auth.signInWithEmailAndPassword(
+        document.getElementById("email").value,
+        document.getElementById("password").value
+      ).then(() => {
+        alert("Login success!");
+        window.location.href = "index.html";
+      }).catch(err => alert(err.message));
+    }
+  </script>
+
+</body>
+</html>
