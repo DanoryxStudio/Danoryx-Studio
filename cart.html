@@ -2,136 +2,124 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cart - Danoryx Studio</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body{
+      font-family: Poppins, sans-serif;
+      background:#f8f3ed;
+      color:#4b352a;
+    }
+  </style>
 </head>
 
-<body class="bg-[#f8f3ed] text-[#4b352a] p-10">
+<body>
 
-  <h1 class="text-3xl font-bold mb-6">Your Cart</h1>
+<!-- HEADER -->
+<div class="bg-[#6d5244] text-white p-5 text-center text-2xl font-bold">
+  Your Cart
+</div>
 
-<div id="cartItems" class="space-y-4"></div>
+<!-- CART LIST -->
+<div class="max-w-3xl mx-auto p-6">
 
-<h2 class="text-2xl font-bold mt-6" id="totalPrice">Total: RM0</h2>
+  <div id="cartItems" class="space-y-4"></div>
 
-<button onclick="checkout()" class="mt-4 bg-[#6d5244] text-white px-6 py-3 rounded-full">
-  Checkout WhatsApp
-</button>
+  <!-- TOTAL -->
+  <div class="mt-8 bg-white p-6 rounded-2xl shadow">
 
-  <h1 class="text-4xl font-bold mb-10">Your Cart</h1>
+    <h2 class="text-xl font-bold">
+      Total: RM <span id="totalPrice">0</span>
+    </h2>
 
-  <div id="cartBox" class="space-y-4"></div>
-
-  <div class="mt-10">
-    <h2 id="total" class="text-2xl font-bold"></h2>
-
-    <button
-      onclick="goCheckout()"
-      class="mt-6 bg-[#6d5244] text-white px-6 py-3 rounded-full"
-    >
-      Proceed Checkout
+    <button onclick="checkout()"
+      class="mt-5 w-full bg-green-600 text-white py-3 rounded-xl">
+      Checkout WhatsApp
     </button>
+
   </div>
 
+</div>
+
 <script>
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-let box = document.getElementById("cartBox");
-let total = 0;
-
-function renderCart(){
-
-  box.innerHTML = "";
-  total = 0;
-
-  cart.forEach((item, index)=>{
-    box.innerHTML += 
-      <div class="bg-white p-5 rounded-2xl shadow flex justify-between">
-        <span>${item.name}</span>
-        <span>RM${item.price}</span>
-      </div>
-    ;
-
-    total += item.price;
-  });
-
-  document.getElementById("total").innerText =
-  "Total: RM" + total;
-}
-
-renderCart();
-
-function goCheckout(){
-  window.location.href = "checkout.html";
-}
-
-  <script>
-function loadCart() {
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-  let container = document.getElementById("cartItems");
-  let total = 0;
+  function renderCart() {
+    let container = document.getElementById("cartItems");
+    let total = 0;
 
-  container.innerHTML = "";
+    container.innerHTML = "";
 
-  cart.forEach((item, index) => {
-    total += item.price;
+    if(cart.length === 0){
+      container.innerHTML = "<p class='text-center text-gray-500'>Cart kosong</p>";
+      document.getElementById("totalPrice").innerText = 0;
+      return;
+    }
 
-    container.innerHTML += 
-      <div class="bg-white p-4 rounded-xl shadow flex justify-between items-center">
-        <div>
-          <h3 class="font-bold">${item.product}</h3>
-          <p>RM${item.price}</p>
+    cart.forEach((item, index) => {
+
+      total += item.price;
+
+      container.innerHTML += 
+        <div class="bg-white p-4 rounded-xl shadow flex justify-between items-center">
+          
+          <div>
+            <h3 class="font-bold">${item.product}</h3>
+            <p>RM${item.price}</p>
+          </div>
+
+          <button onclick="removeItem(${index})"
+            class="bg-red-500 text-white px-3 py-1 rounded-lg">
+            Remove
+          </button>
+
         </div>
-        <button onclick="removeItem(${index})" class="text-red-500">Remove</button>
-      </div>
-    ;
-  });
+      ;
+    });
 
-  document.getElementById("totalPrice").innerText = "Total: RM" + total;
-}
-
-function removeItem(index) {
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  cart.splice(index, 1);
-  localStorage.setItem("cart", JSON.stringify(cart));
-  loadCart();
-}
-
-function checkout() {
-function checkout() {
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-  if(cart.length === 0){
-    alert("Cart kosong");
-    return;
+    document.getElementById("totalPrice").innerText = total;
   }
 
-  let name = prompt("Nama anda:");
-  let phone = prompt("No phone:");
+  function removeItem(index){
+    cart.splice(index, 1);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    renderCart();
+  }
 
-  let message = "🛍️ Hello Danoryx Studio\n\n";
-  message += "Nama: " + name + "\n";
-  message += "Phone: " + phone + "\n\n";
-  message += "Order:\n";
+  function checkout(){
 
-  let total = 0;
+    if(cart.length === 0){
+      alert("Cart kosong!");
+      return;
+    }
 
-  cart.forEach(item => {
-    message += "- " + item.product + " RM" + item.price + "\n";
-    total += item.price;
-  });
+    let name = prompt("Nama anda:");
+    let phone = prompt("No phone:");
 
-  message += "\nTotal: RM" + total;
-  message += "\n\nTerima kasih!";
+    let message = "🛍️ Order Danoryx Studio\n\n";
+    message += "Nama: " + name + "\n";
+    message += "Phone: " + phone + "\n\n";
+    message += "Order:\n";
 
-  let url = "https://wa.me/601170720910?text=" + encodeURIComponent(message);
+    let total = 0;
 
-  window.open(url, "_blank");
-}
+    cart.forEach(item => {
+      message += "- " + item.product + " RM" + item.price + "\n";
+      total += item.price;
+    });
 
-loadCart();
-</script>
+    message += "\nTotal: RM" + total;
+    message += "\n\nTerima kasih ❤️";
+
+    let url = "https://wa.me/601170720910?text=" + encodeURIComponent(message);
+
+    window.open(url, "_blank");
+  }
+
+  renderCart();
 </script>
 
 </body>
