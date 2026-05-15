@@ -15,10 +15,12 @@
         class="bg-[#d8b8a6] text-black px-4 py-2 rounded-full relative"
       >
         🛒 Cart
+
         <span id="cartCount"
           class="ml-1 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
           0
         </span>
+
       </button>
 
       <!-- DASHBOARD -->
@@ -37,6 +39,7 @@
 <!-- CART COUNTER SCRIPT -->
 <script>
   function updateCartCount(){
+
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
     let totalQty = 0;
@@ -46,6 +49,7 @@
     });
 
     let el = document.getElementById("cartCount");
+
     if(el){
       el.innerText = totalQty;
     }
@@ -54,6 +58,6 @@
   // run first time
   updateCartCount();
 
-  // auto sync every 1.5 sec
-  setInterval(updateCartCount, 1500);
+  // auto refresh (smooth sync)
+  setInterval(updateCartCount, 1000);
 </script>
