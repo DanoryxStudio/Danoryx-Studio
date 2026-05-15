@@ -77,7 +77,8 @@ async function loadUsers(){
     ;
   });
 
-  document.getElementById("userList").innerHTML = html || "<p>No users</p>";
+  document.getElementById("userList").innerHTML =
+    html || "<p>No users</p>";
 }
 
 async function makeAgent(id){
@@ -129,7 +130,8 @@ async function loadOrders(){
     ;
   });
 
-  document.getElementById("orderList").innerHTML = html || "<p>No orders</p>";
+  document.getElementById("orderList").innerHTML =
+    html || "<p>No orders</p>";
 }
 
 /* COMPLETE ORDER */
@@ -162,7 +164,6 @@ async function completeOrder(orderId, userId, total){
     }
 
     alert("Order completed!");
-
     loadOrders();
 
   } catch (e) {
@@ -170,7 +171,7 @@ async function completeOrder(orderId, userId, total){
   }
 }
 
-/* ---------------- LOGOUT ---------------- */
+/* LOGOUT */
 
 function logout(){
   auth.signOut().then(() => {
