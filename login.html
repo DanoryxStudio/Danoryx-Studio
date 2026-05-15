@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login - Danoryx Studio</title>
 
-  <!-- Firebase (ONLY COMPAT) -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <style>
     body{
@@ -48,7 +49,7 @@
   <button onclick="login()">Login</button>
 
   <script>
-    // ✅ ONLY ONE CONFIG
+    // 🔥 FIREBASE CONFIG
     const firebaseConfig = {
       apiKey: "AIzaSyAndku52aqfjlTNJMuw80bZWzRVHFP-dcc",
       authDomain: "donoryx-studio.firebaseapp.com",
@@ -59,27 +60,53 @@
     };
 
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
 
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // 🔥 SIGN UP + SAVE TO FIRESTORE
     function signup(){
-      auth.createUserWithEmailAndPassword(
-        document.getElementById("email").value,
-        document.getElementById("password").value
-      ).then(() => {
+      let email = document.getElementById("email").value;
+      let password = document.getElementById("password").value;
+
+      auth.createUserWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+
+        let user = userCredential.user;
+
+        // AUTO ID DROPSHIP
+        let userID = "DS-" + Math.floor(1000000 + Math.random() * 9000000);
+
+        // SAVE TO FIRESTORE
+        db.collection("users").doc(user.uid).set({
+          email: user.email,
+          userId: userID,
+          role: "dropship",
+          totalSales: 0,
+          points: 0,
+          joinDate: new Date()
+        });
+
         alert("Account created!");
         window.location.href = "index.html";
-      }).catch(err => alert(err.message));
+
+      })
+      .catch(err => alert(err.message));
     }
 
+    // 🔥 LOGIN
     function login(){
       auth.signInWithEmailAndPassword(
         document.getElementById("email").value,
         document.getElementById("password").value
-      ).then(() => {
+      )
+      .then(() => {
         alert("Login success!");
         window.location.href = "index.html";
-      }).catch(err => alert(err.message));
+      })
+      .catch(err => alert(err.message));
     }
+
   </script>
 
 </body>
