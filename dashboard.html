@@ -1,49 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard - Danoryx Studio</title>
+
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body{
+      font-family:Poppins, sans-serif;
+      background:#f8f3ed;
+    }
+  </style>
 </head>
 
-<body class="bg-[#f8f3ed] text-[#4b352a] p-10">
+<body>
 
-  <h1 class="text-4xl font-bold mb-10">User Dashboard</h1>
+<!-- TOP BAR -->
+<div class="bg-[#6d5244] text-white p-4 flex justify-between items-center">
+  <h1 class="font-bold text-lg">Danoryx Studio Dashboard</h1>
+  <button onclick="logout()" class="bg-white text-black px-4 py-1 rounded-full">
+    Logout
+  </button>
+</div>
 
-  <div class="bg-white p-6 rounded-2xl shadow space-y-4">
+<!-- MAIN -->
+<div class="max-w-6xl mx-auto p-6">
 
-    <p id="name"></p>
-    <p id="email"></p>
-    <p id="role"></p>
-    <p id="id"></p>
+  <!-- USER CARD -->
+  <div class="bg-white p-6 rounded-3xl shadow mt-6">
+    <h2 class="text-2xl font-bold">Welcome 👋</h2>
 
-    <button
-      onclick="logout()"
-      class="bg-red-500 text-white px-5 py-2 rounded-full mt-5"
-    >
-      Logout
-    </button>
+    <p class="mt-2 text-gray-600">Email: <span id="email"></span></p>
+    <p class="mt-1 text-gray-600">User ID: <span id="userid"></span></p>
+    <p class="mt-1 text-gray-600">Role: <span id="role"></span></p>
+  </div>
+
+  <!-- STATS -->
+  <div class="grid md:grid-cols-3 gap-6 mt-6">
+
+    <div class="bg-white p-6 rounded-3xl shadow text-center">
+      <h3 class="text-xl font-bold">Total Sales</h3>
+      <p class="text-3xl mt-2">RM0</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-3xl shadow text-center">
+      <h3 class="text-xl font-bold">Leaderboard Points</h3>
+      <p class="text-3xl mt-2">0</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-3xl shadow text-center">
+      <h3 class="text-xl font-bold">Status</h3>
+      <p class="text-green-600 font-bold mt-2">ACTIVE</p>
+    </div>
 
   </div>
 
+  <!-- ACTIONS -->
+  <div class="grid md:grid-cols-3 gap-6 mt-6">
+
+    <div class="bg-white p-6 rounded-3xl shadow hover:scale-105 transition">
+      📦 Order History
+    </div>
+
+    <div class="bg-white p-6 rounded-3xl shadow hover:scale-105 transition">
+      📢 Marketing Material
+    </div>
+
+    <div class="bg-white p-6 rounded-3xl shadow hover:scale-105 transition">
+      🔗 Referral Link
+    </div>
+
+  </div>
+
+</div>
+
 <script>
-const user = JSON.parse(localStorage.getItem("danoryx_user"));
+  // FIREBASE
+  const firebaseConfig = {
+    apiKey: "AIzaSyAndku52aqfjlTNJMuw80bZWzRVHFP-dcc",
+    authDomain: "donoryx-studio.firebaseapp.com",
+    projectId: "donoryx-studio",
+    storageBucket: "donoryx-studio.appspot.com",
+    messagingSenderId: "373709857804",
+    appId: "1:373709857804:web:9efec743f0147923fc3a29"
+  };
 
-if(!user){
-  alert("Please login first");
-  window.location.href = "login.html";
-}
+  firebase.initializeApp(firebaseConfig);
 
-document.getElementById("name").innerText = "Name: " + user.name;
-document.getElementById("email").innerText = "Email: " + user.email;
-document.getElementById("role").innerText = "Role: " + user.role;
-document.getElementById("id").innerText = "User ID: " + user.id;
+  const auth = firebase.auth();
+  const db = firebase.firestore();
 
-function logout(){
-  localStorage.removeItem("danoryx_login");
-  alert("Logged out");
-  window.location.href = "login.html";
-}
+  // GET USER
+  auth.onAuthStateChanged(user => {
+    if(!user){
+      window.location.href = "login.html";
+    } else {
+      document.getElementById("email").innerText = user.email;
+
+      db.collection("users").doc(user.uid).get()
+      .then(doc => {
+        if(doc.exists){
+          let data = doc.data();
+          document.getElementById("userid").innerText = data.userId;
+          document.getElementById("role").innerText = data.role;
+        }
+      });
+    }
+  });
+
+  function logout(){
+    auth.signOut().then(() => {
+      window.location.href = "login.html";
+    });
+  }
 </script>
 
 </body>
